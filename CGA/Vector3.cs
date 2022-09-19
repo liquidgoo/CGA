@@ -233,6 +233,18 @@ namespace CGA
             return ViewToClip(width, height, zNear, zFar, ProjectionMode.Pespective);
         }
 
+        public Vector3 ClipToScreen(float width, float height, float xMin, float yMin)
+        {
+            Matrix4 matrix = Matrix4.One();
+
+            matrix[0,0] = width / 2;
+            matrix[1, 1] = -height / 2;
+            matrix[0, 3] = xMin + width / 2;
+            matrix[1, 3] = yMin + height / 2;
+
+            return matrix * this;
+        }
+
         public Vector3(float x, float y, float z)
         {
             this.x = x;
