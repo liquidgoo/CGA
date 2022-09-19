@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace CGA
 {
+
+    public enum ProjectionMode
+    {
+        Orthographic,
+        Pespective
+
+    }
     public struct Vector3
     {
         public float x { get; set; }
@@ -196,6 +203,34 @@ namespace CGA
             matrix[2, 3] = -zAxis * eye;
 
             return matrix * this;
+        }
+
+        public Vector3 ViewToClip(float width, float height, float zNear, float zFar, ProjectionMode projectionMode)
+        {
+            Matrix4 matrix = Matrix4.One();
+
+            matrix[0, 0] = 2 / width;
+            matrix[1, 1] = 2 / height;
+            matrix[2, 2] = 1 / (zNear - zFar);
+            matrix[2, 3] = zNear / (zNear - zFar);
+
+            if (projectionMode == ProjectionMode.Pespective)
+            {
+                matrix[0, 0] *= zNear;
+                matrix[1, 1] *= zNear;
+                matrix[2, 2] *= zFar;
+                matrix[2, 3] *= zFar;
+                matrix[3, 2] = -1;
+                matrix[3, 3] = 0;
+            }
+            return matrix * this;
+        }
+
+        public Vector3 ViewToClipFOV(float FOV, float aspect, float zNear, float zFar)
+        {
+            float height = MathF.Tan(FOV / 2);
+            float width = aspect * height;
+            return ViewToClip(width, height, zNear, zFar, ProjectionMode.Pespective);
         }
 
         public Vector3(float x, float y, float z)
