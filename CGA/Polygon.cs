@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace CGA
 {
-    public struct Polygon
+    public class Polygon
     {
         public int length { get; }
         public Vector3[] vertices { get; }
         public  Vector3[] verticesTextures { get; }
         public Vector3[] verticesNormals { get; }
-
+        public int[] ind;
         public void setVertex(Vector3 vertex, int index)
         {
             vertices[index] = vertex;
@@ -34,6 +34,7 @@ namespace CGA
             vertices = new Vector3[size];
             verticesTextures = new Vector3[size];
             verticesNormals = new Vector3[size];
+            ind = new int[size];
         }
     }
 }

@@ -11,15 +11,14 @@ namespace CGA
     {
         Orthographic,
         Pespective
-
     }
-    public struct Vector3
+    public class Vector3
     {
         public float x { get; set; }
         public float y { get; set; }
         public float z { get; set; }
 
-        private float w;
+        public  float w;
 
         public float this[int index]
         {
@@ -33,6 +32,8 @@ namespace CGA
                         return y;
                     case 2: 
                         return z;
+                    case 3:
+                        return w;
                     default:
                         throw new IndexOutOfRangeException();
                 }
@@ -49,6 +50,9 @@ namespace CGA
                         break;
                     case 2:
                         z = value;
+                        break;
+                    case 3:
+                        w = value;
                         break;
                     default:
                         throw new IndexOutOfRangeException();
@@ -211,26 +215,49 @@ namespace CGA
 
             matrix[0, 0] = 2 / width;
             matrix[1, 1] = 2 / height;
-            matrix[2, 2] = 1 / (zNear - zFar);
-            matrix[2, 3] = zNear / (zNear - zFar);
+            matrix[2, 2] = 1 / (zFar - zNear);
+            matrix[2, 3] = -zNear / (zFar - zNear);
 
             if (projectionMode == ProjectionMode.Pespective)
             {
-                matrix[0, 0] *= zNear;
-                matrix[1, 1] *= zNear;
-                matrix[2, 2] *= zFar;
-                matrix[2, 3] *= zFar;
-                matrix[3, 2] = -1;
+                //matrix[0, 0] *= zNear;
+                //matrix[1, 1] *= zNear;
+                matrix[2, 2] *= zFar ;
+                matrix[2, 3] *= zFar * zNear;
+                matrix[3, 2] = 1;
                 matrix[3, 3] = 0;
             }
-            return matrix * this;
+
+            Vector3 result = matrix * this;
+            if (projectionMode == ProjectionMode.Pespective)
+            {
+                result /= result.w;
+            }
+            return result;
         }
 
         public Vector3 ViewToClipFOV(float FOV, float aspect, float zNear, float zFar)
-        {
-            float height = MathF.Tan(FOV / 2);
+        {/*
+            float height = 2 * MathF.Tan(FOV / 2);
             float width = aspect * height;
-            return ViewToClip(width, height, zNear, zFar, ProjectionMode.Pespective);
+            return ViewToClip(width, height, zNear, zFar, ProjectionMode.Pespective);*/
+
+            Matrix4 matrix = Matrix4.One();
+            matrix[1, 1] = 1/ MathF.Tan(FOV/2);
+            matrix[0, 0] = matrix[1, 1]/aspect;
+
+
+            matrix[2, 2] =  zFar / (zFar - zNear);
+            matrix[2, 3] = -zNear * zFar / (zFar - zNear);
+
+
+                matrix[3, 2] = 1;
+                matrix[3, 3] = 0;
+
+            Vector3 result = matrix * this;
+ 
+            result /= result.w;
+            return result;
         }
 
         public Vector3 ClipToScreen(float width, float height, float xMin, float yMin)
@@ -245,13 +272,30 @@ namespace CGA
             return matrix * this;
         }
 
+        public void updateFrom(Vector3 other)
+        {
+            for (int i =0; i < 4; i++)
+            {
+                this[i] = other[i];
+            }
+        }
+
         public Vector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.w = 0;
+            this.w = 1;
         }
+        public Vector3(float x, float y, float z, float w)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
+        }
+
+        public Vector3() : this(0,0,0) { }
 
     }
 }

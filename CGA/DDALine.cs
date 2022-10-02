@@ -9,7 +9,7 @@ namespace CGA
 {
     class DDALine : IRasterization
     {
-        public IEnumerator<(int,int)> Rasterize(float x1, float y1, float x2, float y2)
+        public IEnumerable<(int,int)> Rasterize(float x1, float y1, float x2, float y2)
         {
             int steps = (int) MathF.Round( MathF.MaxMagnitude(x2 - x1, y2 - y1));
 

@@ -9,13 +9,36 @@ namespace CGA
 {
     public class ObjReader
     {
-        private List<Vector3> vertices = new List<Vector3>();
-        private List<Vector3> verticesTextures = new List<Vector3>();
-        private List<Vector3> verticesNormals = new List<Vector3>();
-        private List<Polygon> polygons = new List<Polygon>();
+        public List<Vector3> vertices  { get; }
+        public List<Vector3> verticesTextures { get; }
+        public List<Vector3> verticesNormals { get; }
+        public List<Polygon> polygons { get; }
 
 
         private const int VERTEX_TEXTURE_LENGTH = 3;
+        public ObjReader copy()
+        {
+            ObjReader objReader = new ObjReader();
+
+
+            foreach (Vector3 vertex in vertices) 
+            {
+                objReader.vertices.Add(vertex + new Vector3());
+            }
+            
+
+            foreach(Polygon poly in polygons)
+            {
+                Polygon newPoly = new Polygon(poly.length);
+                for (int i = 0; i < poly.length; i++)
+                {
+                    newPoly.vertices[i] = objReader.vertices[poly.ind[i]];
+                }
+                objReader.polygons.Add(newPoly);
+            }
+
+            return objReader;
+        }
         private void readVertex(string[] tokens)
         {
             vertices.Add(new Vector3(
@@ -54,8 +77,7 @@ namespace CGA
 
                 int vertexIndex = int.Parse(verticesIndices[0]);
                 polygon.setVertex(vertices[vertexIndex > 0 ? vertexIndex - 1 : vertices.Count - vertexIndex], i -1);
-
-
+                polygon.ind[i - 1] = vertexIndex - 1;
 
                 int vertexTextureIndex = verticesIndices.Length > 1 && !verticesIndices[1].Equals("") ?
                     int.Parse(verticesIndices[1]) : 0;
@@ -99,12 +121,20 @@ namespace CGA
                     break;
             }
         }
-        public ObjReader(string file)
+        public ObjReader(string file) : this()
         {
-            foreach(string line in File.ReadAllLines(file))
+
+            foreach (string line in File.ReadAllLines(file))
             {
                 readLine(line);
             }
+        }
+        public ObjReader()
+        {
+            vertices = new List<Vector3>();
+            verticesTextures = new List<Vector3>();
+            verticesNormals = new List<Vector3>();
+            polygons = new List<Polygon>();
         }
     }
 }
