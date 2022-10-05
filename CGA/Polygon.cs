@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,11 +10,11 @@ namespace CGA
     public class Polygon
     {
         public int length { get; }
-        public Vector3[] vertices { get; }
+        public Vector4[] vertices { get; }
         public  Vector3[] verticesTextures { get; }
         public Vector3[] verticesNormals { get; }
         public int[] ind;
-        public void setVertex(Vector3 vertex, int index)
+        public void setVertex(Vector4 vertex, int index)
         {
             vertices[index] = vertex;
         }
@@ -31,7 +32,7 @@ namespace CGA
         public Polygon(int size)
         {
             this.length = size;
-            vertices = new Vector3[size];
+            vertices = new Vector4[size];
             verticesTextures = new Vector3[size];
             verticesNormals = new Vector3[size];
             ind = new int[size];

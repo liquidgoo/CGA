@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,184 +9,156 @@ namespace CGA
 {
     public class VectorTransform
     {
-        public float magnitude(Vector3 v)
-        {
-            return MathF.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-        }
-
-        public Vector3 normalized(Vector3 v)
-        {
-            return v / magnitude(v);
-        }
-
-        public Vector3 Cross(Vector3 v1, Vector3 v2)
-        {
-            return new Vector3(v1.y * v2.z - v1.z * v2.y,
-                v1.z * v2.x - v1.x * v2.z,
-                v1.x * v2.y - v1.y * v2.x);
-        }
         public Vector3 Scale(Vector3 original, Vector3 scale)
         {
             return new Vector3(original.x * scale.x, original.y * scale.y, original.z * scale.z);
         }
 
-        public Vector3 RotateX(Vector3 v, float angle)
+        public Vector4 RotateX(Vector4 v, float angle)
         {
-            Matrix4 matrix = Matrix4.One();
-            float cos = MathF.Cos(angle);
-            float sin = MathF.Sin(angle);
-            matrix[1, 1] = cos;
-            matrix[1, 2] = -sin;
-            matrix[2, 1] = sin;
-            matrix[2, 2] = cos;
-            return matrix * v;
+            Matrix4x4 matrix = Matrix4x4.CreateRotationX(angle);
+            return Vector4.Transform(v, matrix);
         }
 
 
-        public Vector3 RotateY(Vector3 v, float angle)
+        public Vector4 RotateY(Vector4 v, float angle)
         {
-            Matrix4 matrix = Matrix4.One();
-            float cos = MathF.Cos(angle);
-            float sin = MathF.Sin(angle);
-            matrix[0, 0] = cos;
-            matrix[0, 2] = sin;
-            matrix[2, 0] = -sin;
-            matrix[2, 2] = cos;
-            return matrix * v;
+            Matrix4x4 matrix = Matrix4x4.CreateRotationY(angle);
+            return Vector4.Transform(v, matrix);
         }
 
-        public Vector3 RotateZ(Vector3 v, float angle)
+        public Vector4 RotateZ(Vector4 v, float angle)
         {
-            Matrix4 matrix = Matrix4.One();
-            float cos = MathF.Cos(angle);
-            float sin = MathF.Sin(angle);
-            matrix[0, 0] = cos;
-            matrix[0, 1] = -sin;
-            matrix[1, 0] = sin;
-            matrix[1, 1] = cos;
-            return matrix * v;
+            Matrix4x4 matrix = Matrix4x4.CreateRotationZ(angle);
+            return Vector4.Transform(v, matrix);
         }
 
-        public Vector3 LocalToWorld(Vector3 original, Vector3 xAxis, Vector3 yAxis, Vector3 zAxis, Vector3 translation)
+        public Vector4 LocalToWorld(Vector4 original, Vector4 xAxis, Vector4 yAxis, Vector4 zAxis, Vector4 translation)
         {
-            Matrix4 matrix = Matrix4.One();
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[i, 0] = xAxis[i];
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[i, 1] = yAxis[i];
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[i, 2] = zAxis[i];
-            }
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[i, 3] = translation[i];
-            }
-            return matrix * original;
+            Matrix4x4 matrix = Matrix4x4.Identity;
+
+            matrix.M11 = xAxis.X;
+            matrix.M21 = xAxis.Y;
+            matrix.M31 = xAxis.Z;
+            matrix.M41 = xAxis.W;
+
+            matrix.M12 = yAxis.X;
+            matrix.M22 = yAxis.Y;
+            matrix.M32 = yAxis.Z;
+            matrix.M42 = yAxis.W;
+
+            matrix.M13 = yAxis.X;
+            matrix.M23 = yAxis.Y;
+            matrix.M33 = yAxis.Z;
+            matrix.M43 = yAxis.W;
+
+            matrix.M14 = yAxis.X;
+            matrix.M24 = yAxis.Y;
+            matrix.M34 = yAxis.Z;
+            matrix.M44 = yAxis.W;
+
+            return Vector4.Transform(original, matrix);
         }
 
-        public Vector3 WorldToView(Vector3 original, Vector3 eye, Vector3 target, Vector3 up)
+        public Vector4 WorldToView(Vector4 original, Vector4 eye, Vector4 target, Vector4 up)
         {
-            Vector3 zAxis = normalized(target - eye);
-            Vector3 xAxis = normalized(Cross(up, zAxis));
-            Vector3 yAxis = up;
+            Vector4 zAxis = Vector4.Normalize(target - eye);
+            Vector4 xAxis = Vector4.Normalize(up.Cross(zAxis));
+            Vector4 yAxis = up;
 
-            Matrix4 matrix = Matrix4.One();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[0, i] = xAxis[i];
-            }
+            matrix.M11 = xAxis.X;
+            matrix.M21 = xAxis.Y;
+            matrix.M31 = xAxis.Z;
+            matrix.M41 = xAxis.W;
 
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[1, i] = yAxis[i];
-            }
+            matrix.M12 = yAxis.X;
+            matrix.M22 = yAxis.Y;
+            matrix.M32 = yAxis.Z;
+            matrix.M42 = yAxis.W;
 
-            for (int i = 0; i < 3; i++)
-            {
-                matrix[2, i] = zAxis[i];
-            }
-            matrix[0, 3] = -xAxis * eye;
-            matrix[1, 3] = -yAxis * eye;
-            matrix[2, 3] = -zAxis * eye;
+            matrix.M13 = yAxis.X;
+            matrix.M23 = yAxis.Y;
+            matrix.M33 = yAxis.Z;
+            matrix.M43 = yAxis.W;
 
-            return matrix * original;
+            matrix.M14 = Vector4.Dot(Vector4.Negate(xAxis), eye);
+            matrix.M24 = Vector4.Dot(Vector4.Negate(yAxis), eye);
+            matrix.M34 = Vector4.Dot(Vector4.Negate(zAxis), eye);
+
+            return Vector4.Transform(original, matrix);
         }
 
-        public Vector3 ViewToClip(Vector3 original, float width, float height, float zNear, float zFar, ProjectionMode projectionMode)
+        public Vector4 ViewToClip(Vector4 original, float width, float height, float zNear, float zFar, ProjectionMode projectionMode)
         {
-            Matrix4 matrix = Matrix4.One();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
-            matrix[0, 0] = 2 / width;
-            matrix[1, 1] = 2 / height;
-            matrix[2, 2] = 1 / (zFar - zNear);
-            matrix[2, 3] = -zNear / (zFar - zNear);
+            matrix.M11 = 2 / width;
+            matrix.M22 = 2 / height;
+            matrix.M33 = 1 / (zFar - zNear);
+            matrix.M34 = -zNear / (zFar - zNear);
 
             if (projectionMode == ProjectionMode.Pespective)
             {
                 //matrix[0, 0] *= zNear;
                 //matrix[1, 1] *= zNear;
-                matrix[2, 2] *= zFar;
-                matrix[2, 3] *= zFar * zNear;
-                matrix[3, 2] = 1;
-                matrix[3, 3] = 0;
+                matrix.M33 *= zFar;
+                matrix.M34 *= zFar * zNear;
+                matrix.M43 = 1;
+                matrix.M44 = 0;
             }
 
-            Vector3 result = matrix * original;
+            Vector4 result = Vector4.Transform(original, matrix);
             if (projectionMode == ProjectionMode.Pespective)
             {
-                result /= result.w;
+                result /= result.W;
             }
             return result;
         }
 
-        public Vector3 ViewToClipFOV(Vector3 original, float FOV, float aspect, float zNear, float zFar)
+        public Vector4 ViewToClipFOV(Vector4 original, float FOV, float aspect, float zNear, float zFar)
         {/*
             float height = 2 * MathF.Tan(FOV / 2);
             float width = aspect * height;
             return ViewToClip(width, height, zNear, zFar, ProjectionMode.Pespective);*/
 
-            Matrix4 matrix = Matrix4.One();
-            matrix[1, 1] = 1 / MathF.Tan(FOV / 2);
-            matrix[0, 0] = matrix[1, 1] / aspect;
+            Matrix4x4 matrix = Matrix4x4.Identity;
+            matrix.M22 = 1 / MathF.Tan(FOV / 2);
+            matrix.M11 = matrix.M22 / aspect;
 
 
-            matrix[2, 2] = zFar / (zFar - zNear);
-            matrix[2, 3] = -zNear * zFar / (zFar - zNear);
+            matrix.M33 = zFar / (zFar - zNear);
+            matrix.M34 = -zNear * zFar / (zFar - zNear);
 
 
-            matrix[3, 2] = 1;
-            matrix[3, 3] = 0;
+            matrix.M43 = 1;
+            matrix.M44 = 0;
 
-            Vector3 result = matrix * original;
+            Vector4 result = Vector4.Transform(original, matrix);
 
-            result /= result.w;
+            result /= result.W;
             return result;
         }
 
-        public Vector3 ClipToScreen(Vector3 original, float width, float height, float xMin, float yMin)
+        public Vector4 ClipToScreen(Vector4 original, float width, float height, float xMin, float yMin)
         {
-            Matrix4 matrix = Matrix4.One();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
-            matrix[0, 0] = width / 2;
-            matrix[1, 1] = -height / 2;
-            matrix[0, 3] = xMin + width / 2;
-            matrix[1, 3] = yMin + height / 2;
+            matrix.M11 = width / 2;
+            matrix.M22 = -height / 2;
+            matrix.M14 = xMin + width / 2;
+            matrix.M24 = yMin + height / 2;
 
-            return matrix * original;
+            return Vector4.Transform(original, matrix);
         }
 
-        public void updateFrom(Vector3 original, Vector3 other)
+        public void updateFrom(Vector4 original, Vector4 other)
         {
-            for (int i = 0; i < 4; i++)
-            {
-                original[i] = other[i];
-            }
+            original.X = other.X;
+            original.Y = other.Y;
+            original.Z = other.Z;
+            original.W = other.W;
         }
 
     }

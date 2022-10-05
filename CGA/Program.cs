@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,8 +20,8 @@ namespace CGA
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
 
-            Vector3 v1 = new Vector3(0.1f, 0.1f, 0.2f);
-            Vector3 v2 = new Vector3(0.1f, 0.1f, 2);
+            Vector4 v1 = new Vector4(0.1f, 0.1f, 0.2f, 1f);
+            Vector4 v2 = new Vector4(0.1f, 0.1f, 2, 1f);
 
             VectorTransform transform = new VectorTransform();
 
