@@ -10,7 +10,7 @@ namespace CGA
 {
     public class ObjReader
     {
-        public List<Vector3> vertices  { get; }
+        public List<Vector4> vertices  { get; }
         public List<Vector3> verticesTextures { get; }
         public List<Vector3> verticesNormals { get; }
         public List<Polygon> polygons { get; }
@@ -22,9 +22,9 @@ namespace CGA
             ObjReader objReader = new ObjReader();
 
 
-            foreach (Vector3 vertex in vertices) 
+            foreach (Vector4 vertex in vertices) 
             {
-                objReader.vertices.Add(vertex + new Vector3());
+                objReader.vertices.Add(vertex + new Vector4());
             }
             
 
@@ -42,8 +42,8 @@ namespace CGA
         }
         private void readVertex(string[] tokens)
         {
-            vertices.Add(new Vector3(
-                float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3])));
+            vertices.Add(new Vector4(
+                float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]), 1f));
             //TODO 4?
         }
 
@@ -132,7 +132,7 @@ namespace CGA
         }
         public ObjReader()
         {
-            vertices = new List<Vector3>();
+            vertices = new List<Vector4>();
             verticesTextures = new List<Vector3>();
             verticesNormals = new List<Vector3>();
             polygons = new List<Polygon>();

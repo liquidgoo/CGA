@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,13 +17,13 @@ namespace CGA
 
         private VectorTransform transform = new VectorTransform();
 
-        private Vector3 cameraPos = new Vector3(0, 0.25f, -0.75f);
-        private Vector3 cameraTarget = new Vector3(0, 0.25f, 0);
-        private Vector3 cameraUp = new Vector3(0, 1, 0);
+        private Vector4 cameraPos = new Vector4(0, 0.25f, -0.75f, 1f);
+        private Vector4 cameraTarget = new Vector4(0, 0.25f, 0, 1f);
+        private Vector4 cameraUp = new Vector4(0, 1, 0, 1f);
 
-        private Vector3 xAxis = new Vector3(1, 0, 0);
-        private Vector3 yAxis = new Vector3(0, 1, 0);
-        private Vector3 zAxis = new Vector3(0, 0, 1);
+        private Vector4 xAxis = new Vector4(1, 0, 0, 1f);
+        private Vector4 yAxis = new Vector4(0, 1, 0, 1f);
+        private Vector4 zAxis = new Vector4(0, 0, 1, 1f);
 
 
         Bitmap bitmap = new Bitmap(1081, 721);
@@ -43,9 +44,9 @@ namespace CGA
         {
             DateTime time = DateTime.Now;
             ObjReader objReader = model.copy();
-            foreach (Vector3 vertex in objReader.vertices)
+            foreach (Vector4 vertex in objReader.vertices)
             {
-                transform.updateFrom(vertex, transform.LocalToWorld(vertex, xAxis, yAxis, zAxis, new Vector3(0,0,0)));
+                transform.updateFrom(vertex, transform.LocalToWorld(vertex, xAxis, yAxis, zAxis, new Vector4(0,0,0, 1f)));
                 transform.updateFrom(vertex, transform.WorldToView(vertex, cameraPos, cameraTarget, cameraUp));
                 transform.updateFrom(vertex, transform.ViewToClip(vertex, 1.778f, 1, 0, 100, ProjectionMode.Pespective));
 
@@ -73,14 +74,14 @@ namespace CGA
             {
                 for (int i = 0; i < polygon.length; i++)
                 {
-                    Vector3 p1 = polygon.vertices[i];
-                    Vector3 p2 = polygon.vertices[(i + 1) % polygon.length];
-                    if (p1.x > 1 || p1.x < -1 || p1.y > 1 || p1.y < -1 || p1.z > 1 || p1.z < 0 ||
-                        p2.x > 1 || p2.x < -1 || p2.y > 1 || p2.y < -1 || p2.z > 1 || p2.z < 0) continue;
+                    Vector4 p1 = polygon.vertices[i];
+                    Vector4 p2 = polygon.vertices[(i + 1) % polygon.length];
+                    if (p1.X > 1 || p1.X < -1 || p1.Y > 1 || p1.Y < -1 || p1.Z > 1 || p1.Z < 0 ||
+                        p2.X > 1 || p2.X < -1 || p2.Y > 1 || p2.Y < -1 || p2.Z > 1 || p2.Z < 0) continue;
                     p1 = transform.ClipToScreen(p1, 1080, 720, 0, 0);
                     p2 = transform.ClipToScreen(p2, 1080, 720, 0, 0);
 
-                    foreach ((int, int) point in rasterization.Rasterize(p1.x, p1.y, p2.x, p2.y))
+                    foreach ((int, int) point in rasterization.Rasterize(p1.X, p1.Y, p2.X, p2.Y))
                     {
                         int pixel = point.Item2 * bmpData.Stride + point.Item1 * 4 ;
                         rgbValues[pixel] = 255;
