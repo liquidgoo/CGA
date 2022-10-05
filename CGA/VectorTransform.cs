@@ -40,22 +40,22 @@ namespace CGA
             matrix.M11 = xAxis.X;
             matrix.M21 = xAxis.Y;
             matrix.M31 = xAxis.Z;
-            matrix.M41 = xAxis.W;
+            matrix.M41 = 0;
 
             matrix.M12 = yAxis.X;
             matrix.M22 = yAxis.Y;
             matrix.M32 = yAxis.Z;
-            matrix.M42 = yAxis.W;
+            matrix.M42 = 0;
 
             matrix.M13 = yAxis.X;
             matrix.M23 = yAxis.Y;
             matrix.M33 = yAxis.Z;
-            matrix.M43 = yAxis.W;
+            matrix.M43 = 0;
 
             matrix.M14 = yAxis.X;
             matrix.M24 = yAxis.Y;
             matrix.M34 = yAxis.Z;
-            matrix.M44 = yAxis.W;
+            matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
         }
@@ -71,21 +71,22 @@ namespace CGA
             matrix.M11 = xAxis.X;
             matrix.M21 = xAxis.Y;
             matrix.M31 = xAxis.Z;
-            matrix.M41 = xAxis.W;
+            matrix.M41 = 0;
 
             matrix.M12 = yAxis.X;
             matrix.M22 = yAxis.Y;
             matrix.M32 = yAxis.Z;
-            matrix.M42 = yAxis.W;
+            matrix.M42 = 0;
 
             matrix.M13 = yAxis.X;
             matrix.M23 = yAxis.Y;
             matrix.M33 = yAxis.Z;
-            matrix.M43 = yAxis.W;
+            matrix.M43 = 0;
 
             matrix.M14 = Vector4.Dot(Vector4.Negate(xAxis), eye);
             matrix.M24 = Vector4.Dot(Vector4.Negate(yAxis), eye);
             matrix.M34 = Vector4.Dot(Vector4.Negate(zAxis), eye);
+            matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
         }
