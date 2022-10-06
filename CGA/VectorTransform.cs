@@ -35,26 +35,26 @@ namespace CGA
 
         public Vector4 LocalToWorld(Vector4 original, Vector4 xAxis, Vector4 yAxis, Vector4 zAxis, Vector4 translation)
         {
-            Matrix4x4 matrix = Matrix4x4.Identity;
+            Matrix4x4 matrix = new Matrix4x4();
 
             matrix.M11 = xAxis.X;
-            matrix.M21 = xAxis.Y;
-            matrix.M31 = xAxis.Z;
-            matrix.M41 = 0;
+            matrix.M12 = xAxis.Y;
+            matrix.M13 = xAxis.Z;
+            matrix.M14 = 0;
 
-            matrix.M12 = yAxis.X;
+            matrix.M21 = yAxis.X;
             matrix.M22 = yAxis.Y;
-            matrix.M32 = yAxis.Z;
-            matrix.M42 = 0;
+            matrix.M23 = yAxis.Z;
+            matrix.M24 = 0;
 
-            matrix.M13 = yAxis.X;
-            matrix.M23 = yAxis.Y;
+            matrix.M31 = yAxis.X;
+            matrix.M32 = yAxis.Y;
             matrix.M33 = yAxis.Z;
-            matrix.M43 = 0;
+            matrix.M34 = 0;
 
-            matrix.M14 = yAxis.X;
-            matrix.M24 = yAxis.Y;
-            matrix.M34 = yAxis.Z;
+            matrix.M41 = yAxis.X;
+            matrix.M42 = yAxis.Y;
+            matrix.M43 = yAxis.Z;
             matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
@@ -66,26 +66,26 @@ namespace CGA
             Vector4 xAxis = Vector4.Normalize(up.Cross(zAxis));
             Vector4 yAxis = up;
 
-            Matrix4x4 matrix = Matrix4x4.Identity;
+            Matrix4x4 matrix = new Matrix4x4();
 
             matrix.M11 = xAxis.X;
-            matrix.M21 = xAxis.Y;
-            matrix.M31 = xAxis.Z;
-            matrix.M41 = 0;
+            matrix.M12 = xAxis.Y;
+            matrix.M13 = xAxis.Z;
+            matrix.M14 = 0;
 
-            matrix.M12 = yAxis.X;
+            matrix.M21 = yAxis.X;
             matrix.M22 = yAxis.Y;
-            matrix.M32 = yAxis.Z;
-            matrix.M42 = 0;
+            matrix.M23 = yAxis.Z;
+            matrix.M24 = 0;
 
-            matrix.M13 = yAxis.X;
-            matrix.M23 = yAxis.Y;
+            matrix.M31 = yAxis.X;
+            matrix.M32 = yAxis.Y;
             matrix.M33 = yAxis.Z;
-            matrix.M43 = 0;
+            matrix.M34 = 0;
 
-            matrix.M14 = Vector4.Dot(Vector4.Negate(xAxis), eye);
-            matrix.M24 = Vector4.Dot(Vector4.Negate(yAxis), eye);
-            matrix.M34 = Vector4.Dot(Vector4.Negate(zAxis), eye);
+            matrix.M41 = Vector4.Dot(Vector4.Negate(xAxis), eye);
+            matrix.M42 = Vector4.Dot(Vector4.Negate(yAxis), eye);
+            matrix.M43 = Vector4.Dot(Vector4.Negate(zAxis), eye);
             matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
@@ -93,20 +93,20 @@ namespace CGA
 
         public Vector4 ViewToClip(Vector4 original, float width, float height, float zNear, float zFar, ProjectionMode projectionMode)
         {
-            Matrix4x4 matrix = Matrix4x4.Identity;
+            Matrix4x4 matrix = new Matrix4x4();
 
             matrix.M11 = 2 / width;
             matrix.M22 = 2 / height;
             matrix.M33 = 1 / (zFar - zNear);
-            matrix.M34 = -zNear / (zFar - zNear);
+            matrix.M43 = -zNear / (zFar - zNear);
 
             if (projectionMode == ProjectionMode.Pespective)
             {
                 //matrix[0, 0] *= zNear;
                 //matrix[1, 1] *= zNear;
                 matrix.M33 *= zFar;
-                matrix.M34 *= zFar * zNear;
-                matrix.M43 = 1;
+                matrix.M43 *= zFar * zNear;
+                matrix.M34 = 1;
                 matrix.M44 = 0;
             }
 
@@ -130,10 +130,10 @@ namespace CGA
 
 
             matrix.M33 = zFar / (zFar - zNear);
-            matrix.M34 = -zNear * zFar / (zFar - zNear);
+            matrix.M43 = -zNear * zFar / (zFar - zNear);
 
 
-            matrix.M43 = 1;
+            matrix.M34 = 1;
             matrix.M44 = 0;
 
             Vector4 result = Vector4.Transform(original, matrix);
@@ -144,12 +144,17 @@ namespace CGA
 
         public Vector4 ClipToScreen(Vector4 original, float width, float height, float xMin, float yMin)
         {
-            Matrix4x4 matrix = Matrix4x4.Identity;
+            Matrix4x4 matrix = new Matrix4x4();
 
             matrix.M11 = width / 2;
             matrix.M22 = -height / 2;
-            matrix.M14 = xMin + width / 2;
-            matrix.M24 = yMin + height / 2;
+            matrix.M41 = xMin + width / 2;
+            matrix.M42 = yMin + height / 2;
+
+            matrix.M33 = 1;
+            matrix.M44 = 1;
+
+            Vector4 v = Vector4.Transform(original, matrix);
 
             return Vector4.Transform(original, matrix);
         }
