@@ -159,12 +159,14 @@ namespace CGA
             return Vector4.Transform(original, matrix);
         }
 
-        public void updateFrom(Vector4 original, Vector4 other)
+        public Vector4 updateFrom(Vector4 original, Vector4 other)
         {
             original.X = other.X;
             original.Y = other.Y;
             original.Z = other.Z;
             original.W = other.W;
+
+            return original;
         }
 
     }
