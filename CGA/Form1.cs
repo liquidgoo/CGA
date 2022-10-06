@@ -44,12 +44,12 @@ namespace CGA
         {
             DateTime time = DateTime.Now;
             ObjReader objReader = model.copy();
-            foreach (Vector4 vertex in objReader.vertices)
+            for (int i = 0;  i < objReader.vertices.Count; i++)
             {
-                transform.updateFrom(vertex, transform.LocalToWorld(vertex, xAxis, yAxis, zAxis, new Vector4(0,0,0, 1f)));
-                transform.updateFrom(vertex, transform.WorldToView(vertex, cameraPos, cameraTarget, cameraUp));
-                transform.updateFrom(vertex, transform.ViewToClip(vertex, 1.778f, 1, 0, 100, ProjectionMode.Pespective));
-
+                Vector4 vertex = objReader.vertices[i];
+                objReader.vertices[i] = transform.updateFrom(vertex, transform.LocalToWorld(vertex, xAxis, yAxis, zAxis, new Vector4(0,0,0, 1f)));
+                objReader.vertices[i] = transform.updateFrom(vertex, transform.WorldToView(vertex, cameraPos, cameraTarget, cameraUp));
+                objReader.vertices[i] = transform.updateFrom(vertex, transform.ViewToClip(vertex, 1.778f, 1, 0, 100, ProjectionMode.Pespective));
             }
             DateTime time2 = DateTime.Now;
             Debug.WriteLine((time2 - time).TotalSeconds);
