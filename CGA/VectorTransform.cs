@@ -35,7 +35,7 @@ namespace CGA
 
         public Vector4 LocalToWorld(Vector4 original, Vector4 xAxis, Vector4 yAxis, Vector4 zAxis, Vector4 translation)
         {
-            Matrix4x4 matrix = new Matrix4x4();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
             matrix.M11 = xAxis.X;
             matrix.M12 = xAxis.Y;
@@ -47,14 +47,14 @@ namespace CGA
             matrix.M23 = yAxis.Z;
             matrix.M24 = 0;
 
-            matrix.M31 = yAxis.X;
-            matrix.M32 = yAxis.Y;
-            matrix.M33 = yAxis.Z;
+            matrix.M31 = zAxis.X;
+            matrix.M32 = zAxis.Y;
+            matrix.M33 = zAxis.Z;
             matrix.M34 = 0;
 
-            matrix.M41 = yAxis.X;
-            matrix.M42 = yAxis.Y;
-            matrix.M43 = yAxis.Z;
+            matrix.M41 = translation.X;
+            matrix.M42 = translation.Y;
+            matrix.M43 =  translation.Z;
             matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
@@ -66,26 +66,26 @@ namespace CGA
             Vector4 xAxis = Vector4.Normalize(up.Cross(zAxis));
             Vector4 yAxis = up;
 
-            Matrix4x4 matrix = new Matrix4x4();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
             matrix.M11 = xAxis.X;
-            matrix.M12 = xAxis.Y;
-            matrix.M13 = xAxis.Z;
+            matrix.M21 = xAxis.Y;
+            matrix.M31 = xAxis.Z;
             matrix.M14 = 0;
 
-            matrix.M21 = yAxis.X;
+            matrix.M12 = yAxis.X;
             matrix.M22 = yAxis.Y;
-            matrix.M23 = yAxis.Z;
+            matrix.M32 = yAxis.Z;
             matrix.M24 = 0;
 
-            matrix.M31 = yAxis.X;
-            matrix.M32 = yAxis.Y;
-            matrix.M33 = yAxis.Z;
+            matrix.M13 = zAxis.X;
+            matrix.M23 = zAxis.Y;
+            matrix.M33 = zAxis.Z;
             matrix.M34 = 0;
 
-            matrix.M41 = Vector4.Dot(Vector4.Negate(xAxis), eye);
-            matrix.M42 = Vector4.Dot(Vector4.Negate(yAxis), eye);
-            matrix.M43 = Vector4.Dot(Vector4.Negate(zAxis), eye);
+            matrix.M41 = Vector4Extension.Dot(Vector4.Negate(xAxis), eye);
+            matrix.M42 = Vector4Extension.Dot(Vector4.Negate(yAxis), eye);
+            matrix.M43 = Vector4Extension.Dot(Vector4.Negate(zAxis), eye);
             matrix.M44 = 1;
 
             return Vector4.Transform(original, matrix);
@@ -93,7 +93,7 @@ namespace CGA
 
         public Vector4 ViewToClip(Vector4 original, float width, float height, float zNear, float zFar, ProjectionMode projectionMode)
         {
-            Matrix4x4 matrix = new Matrix4x4();
+            Matrix4x4 matrix = Matrix4x4.Identity;
 
             matrix.M11 = 2 / width;
             matrix.M22 = 2 / height;
@@ -144,8 +144,7 @@ namespace CGA
 
         public Vector4 ClipToScreen(Vector4 original, float width, float height, float xMin, float yMin)
         {
-            Matrix4x4 matrix = new Matrix4x4();
-
+            Matrix4x4 matrix = Matrix4x4.Identity; 
             matrix.M11 = width / 2;
             matrix.M22 = -height / 2;
             matrix.M41 = xMin + width / 2;
@@ -153,10 +152,11 @@ namespace CGA
 
             matrix.M33 = 1;
             matrix.M44 = 1;
-
             Vector4 v = Vector4.Transform(original, matrix);
 
-            return Vector4.Transform(original, matrix);
+
+
+            return Vector4.Transform(original,  matrix);
         }
 
         public Vector4 updateFrom(Vector4 original, Vector4 other)
