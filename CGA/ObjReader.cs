@@ -13,7 +13,7 @@ namespace CGA
         public List<Vector4> vertices  { get; }
         public List<Vector3> verticesTextures { get; }
         public List<Vector3> verticesNormals { get; }
-        public List<Polygon> polygons { get; }
+        public List<Polygon> polygons { get; set; }
 
 
         private const int VERTEX_TEXTURE_LENGTH = 3;
@@ -26,9 +26,10 @@ namespace CGA
             {
                 objReader.vertices.Add(vertex + new Vector4());
             }
-            
 
-            foreach(Polygon poly in polygons)
+
+            objReader.polygons = polygons;
+/*            foreach(Polygon poly in polygons)
             {
                 Polygon newPoly = new Polygon(poly.length);
                 for (int i = 0; i < poly.length; i++)
@@ -36,7 +37,7 @@ namespace CGA
                     newPoly.vertices[i] = objReader.vertices[poly.ind[i]];
                 }
                 objReader.polygons.Add(newPoly);
-            }
+            }*/
 
             return objReader;
         }
