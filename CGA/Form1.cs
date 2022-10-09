@@ -17,7 +17,7 @@ namespace CGA
 
         private VectorTransform transform = new VectorTransform();
 
-        private Vector4 cameraPos = new Vector4(0, 0.25f, -1f, 1f);
+        private Vector4 cameraPos = new Vector4(0, 0.25f, 1f, 1f);
         private Vector4 cameraTarget = new Vector4(0, 0.25f, 0, 1f);
         private Vector4 cameraUp = new Vector4(0, 1, 0, 1f);
 
@@ -47,7 +47,7 @@ namespace CGA
         {
             DateTime time = DateTime.Now;
             ObjReader objReader = model.copy();
-            for (int i = 0;  i < objReader.vertices.Count; i++)
+            for (int i = 0;  i < objReader.vertices.Length; i++)
             {
                 Vector4 vertex = objReader.vertices[i];
                 vertex = transform.updateFrom(vertex, transform.LocalToWorld(vertex, xAxis, yAxis, zAxis, new Vector4(0,0,0, 1f)));
@@ -117,29 +117,28 @@ namespace CGA
         }
         private int x = 0;
         private int y = 0;
-        private float rot = 0.0005f;
-
+        private float rot = 0.002f;
+        private float radius = 1;
         private void Form1_MouseMove(object sender, MouseEventArgs e)
         {
             if (a)
             {
                 alpha += (e.X - x) * rot;
                 beta += (e.Y - y) * rot;
+                if (beta > MathF.PI / 2)
+                    beta = MathF.PI / 2;
+                if (beta < -MathF.PI / 2)
+                    beta = -MathF.PI / 2;
                 float sina = MathF.Sin(alpha);
                 float sinb = MathF.Sin(beta);
                 float cosa = MathF.Cos(alpha);
                 float cosb = MathF.Cos(beta);
-                zAxis = new Vector4(sina * cosb, sinb, cosa * cosb, 1f);
-                 sina = MathF.Sin(alpha + MathF.PI /2);
-                 sinb = MathF.Sin(beta);
-                 cosa = MathF.Cos(alpha + MathF.PI / 2);
-                 cosb = MathF.Cos(beta);
-                xAxis = new Vector4(sina * cosb, sinb, cosa * cosb, 1f);
-                sina = MathF.Sin(alpha );
+                cameraPos = new Vector4(sina * cosb, sinb + 0.25f, cosa * cosb, 1) * radius;
+                sina = MathF.Sin(alpha);
                 sinb = MathF.Sin(beta + MathF.PI / 2);
-                cosa = MathF.Cos(alpha );
+                cosa = MathF.Cos(alpha);
                 cosb = MathF.Cos(beta + MathF.PI / 2);
-                yAxis = new Vector4(sina * cosb, sinb, cosa * cosb, 1f);
+                cameraUp = new Vector4(sina * cosb, sinb , cosa * cosb, 1);
                 x = e.X;
                 y = e.Y;
                 drawModel();

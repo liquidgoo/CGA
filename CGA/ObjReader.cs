@@ -10,7 +10,8 @@ namespace CGA
 {
     public class ObjReader
     {
-        public List<Vector4> vertices  { get; }
+        public Vector4[] vertices;
+        private List<Vector4> v = new List<Vector4>();
         public List<Vector3> verticesTextures { get; }
         public List<Vector3> verticesNormals { get; }
         public List<Polygon> polygons { get; set; }
@@ -22,10 +23,8 @@ namespace CGA
             ObjReader objReader = new ObjReader();
 
 
-            foreach (Vector4 vertex in vertices) 
-            {
-                objReader.vertices.Add(vertex + new Vector4());
-            }
+            vertices.CopyTo(objReader.vertices, 0);
+
 
 
             objReader.polygons = polygons;
@@ -43,7 +42,7 @@ namespace CGA
         }
         private void readVertex(string[] tokens)
         {
-            vertices.Add(new Vector4(
+            v.Add(new Vector4(
                 float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3]), 1f));
             //TODO 4?
         }
@@ -78,7 +77,7 @@ namespace CGA
                 string[] verticesIndices = tokens[i].Split('/');
 
                 int vertexIndex = int.Parse(verticesIndices[0]);
-                polygon.setVertex(vertices[vertexIndex > 0 ? vertexIndex - 1 : vertices.Count - vertexIndex], i -1);
+                polygon.setVertex(vertices[vertexIndex > 0 ? vertexIndex - 1 : v.Count - vertexIndex], i -1);
                 polygon.ind[i - 1] = vertexIndex - 1;
 
                 int vertexTextureIndex = verticesIndices.Length > 1 && !verticesIndices[1].Equals("") ?
@@ -130,10 +129,14 @@ namespace CGA
             {
                 readLine(line);
             }
+            vertices = new Vector4[v.Count];
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] = v[i];
+            }
         }
         public ObjReader()
         {
-            vertices = new List<Vector4>();
             verticesTextures = new List<Vector3>();
             verticesNormals = new List<Vector3>();
             polygons = new List<Polygon>();
