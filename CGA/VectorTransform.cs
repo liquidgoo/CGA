@@ -169,10 +169,5 @@ namespace CGA
             return original;
         }
 
-    /*    public Vector4 CreateCameraRotation()
-        {
-            return ;
-        }*/
-
     }
 }
