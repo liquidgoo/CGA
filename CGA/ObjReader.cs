@@ -21,6 +21,7 @@ namespace CGA
         public ObjReader copy()
         {
             ObjReader objReader = new ObjReader();
+            objReader.vertices = new Vector4[vertices.Length];
 
 
             vertices.CopyTo(objReader.vertices, 0);
@@ -77,7 +78,7 @@ namespace CGA
                 string[] verticesIndices = tokens[i].Split('/');
 
                 int vertexIndex = int.Parse(verticesIndices[0]);
-                polygon.setVertex(vertices[vertexIndex > 0 ? vertexIndex - 1 : v.Count - vertexIndex], i -1);
+                //polygon.setVertex(vertices[vertexIndex > 0 ? vertexIndex - 1 : v.Count - vertexIndex], i -1);
                 polygon.ind[i - 1] = vertexIndex - 1;
 
                 int vertexTextureIndex = verticesIndices.Length > 1 && !verticesIndices[1].Equals("") ?

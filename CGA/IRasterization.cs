@@ -9,6 +9,6 @@ namespace CGA
 {
     public interface IRasterization
     {
-        public IEnumerable<(int, int)> Rasterize(float x1, float y1, float x2, float y2);
+        public (int, int)[] Rasterize(float x1, float y1, float x2, float y2);
     }
 }

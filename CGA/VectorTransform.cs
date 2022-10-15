@@ -152,8 +152,6 @@ namespace CGA
 
             matrix.M33 = 1;
             matrix.M44 = 1;
-            Vector4 v = Vector4.Transform(original, matrix);
-
 
 
             return Vector4.Transform(original,  matrix);
